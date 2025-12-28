@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+  <title>Taranga AR Bug Hunt</title>
+
+  <!-- Google Fonts: Syne for headings, Poppins for clean body text -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Poppins', 'sans-serif'],
+            display: ['Syne', 'sans-serif'],
+          },
+          colors: {
+            ink: '#000000',
+            paper: '#ffffff',
+            zinc: {
+              950: '#09090b',
+              900: '#18181b',
+              800: '#27272a'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Prevent text selection on long press for a more app-like feel */
+    body {
+      -webkit-tap-highlight-color: transparent;
+      background-color: #09090b;
+    }
+    
+    .smooth-transition {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Subtle fade-in for the whole page */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-in {
+      animation: fadeIn 0.6s ease-out forwards;
+    }
+  </style>
+</head>
+
+<body class="text-zinc-300 font-sans min-h-screen flex flex-col items-center justify-center p-5">
+
+  <div class="w-full max-w-sm animate-in opacity-0">
+    
+    <!-- Logo Placeholder -->
+    <div class="flex justify-center mb-8">
+      <div class="w-20 h-20 bg-white rounded-2xl flex items-center justify-center shadow-[0_0_30px_rgba(255,255,255,0.1)]">
+        <!-- Replace SVG below with your actual Logo -->
+        <svg class="w-10 h-10 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-3.04l.533-.811a7.122 7.122 0 001.203-4.946 7.12 7.12 0 011.203-4.946l.533-.811m-.001 0a7.122 7.122 0 00-1.203 4.946 7.12 7.12 0 01-1.203 4.946l-.533.811m3.44 3.041A8.959 8.959 0 0112 21c-4.418 0-8-3.582-8-8 0-3.517 1.009-6.799 2.753-9.571m3.44 3.04l-.533.811a7.122 7.122 0 00-1.203 4.946 7.12 7.12 0 011.203-4.946l.533-.811m0 0a7.12 7.12 0 011.203-4.946 7.122 7.122 0 011.203 4.946l.533.811m0 0A8.959 8.959 0 0112 3c4.418 0 8 3.582 8 8 0 3.517-1.009 6.799-2.753 9.571m-3.44-3.04l.533-.811a7.122 7.122 0 001.203-4.946 7.12 7.12 0 011.203-4.946l.533-.811"></path>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Header Content -->
+    <header class="text-center mb-10">
+      <h1 class="font-display text-3xl text-white tracking-tight mb-2">
+        Taranga Bug Hunt
+      </h1>
+      <p class="text-zinc-500 text-sm">
+        Enter your team details to download the APK.
+      </p>
+    </header>
+
+    <!-- Form -->
+    <form action="/verify" method="POST" class="space-y-5">
+      <div>
+        <label for="team_name" class="block text-xs font-semibold text-zinc-500 uppercase tracking-widest mb-2 ml-1">
+          Team Name
+        </label>
+        <input
+          type="text"
+          name="team_name"
+          id="team_name"
+          required
+          autocomplete="off"
+          placeholder="e.g. Shadow Hunters"
+          class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-4 text-white focus:outline-none focus:border-white focus:ring-1 focus:ring-white transition-all placeholder-zinc-700"
+        />
+      </div>
+
+      <div>
+        <label for="team_number" class="block text-xs font-semibold text-zinc-500 uppercase tracking-widest mb-2 ml-1">
+          Team Number
+        </label>
+        <input
+          type="number"
+          name="team_number"
+          id="team_number"
+          required
+          min="1"
+          placeholder="e.g. 42"
+          class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-4 text-white focus:outline-none focus:border-white focus:ring-1 focus:ring-white transition-all placeholder-zinc-700"
+        />
+      </div>
+
+      <div class="pt-4">
+        <button
+          type="submit"
+          class="w-full bg-white text-black font-bold py-4 rounded-xl hover:bg-zinc-200 active:scale-[0.98] smooth-transition shadow-lg"
+        >
+          Verify & Download
+        </button>
+      </div>
+    </form>
+
+    <!-- Error Display Area -->
+    <div id="error-message" class="mt-6"></div>
+
+    <!-- Footer -->
+    <footer class="mt-12 text-center">
+      <p class="text-[11px] text-zinc-600 uppercase tracking-[0.2em]">
+        One-time download only
+      </p>
+    </footer>
+
+  </div>
+
+  <script>
+    // Simple Error Handler
+    const urlParams = new URLSearchParams(window.location.search);
+    const error = urlParams.get('error');
+
+    if (error) {
+      const errorDiv = document.getElementById('error-message');
+      const messages = {
+        'invalid': 'Invalid name or number.',
+        'unauthorized': 'Team not registered.',
+        'already_downloaded': 'Download limit reached.',
+        'default': 'Something went wrong.'
+      };
+
+      const message = messages[error] || messages['default'];
+
+      errorDiv.innerHTML = `
+        <div class="text-center p-3 rounded-lg border border-red-900/30 bg-red-950/20 text-red-400 text-xs font-medium animate-pulse">
+          ${message}
+        </div>
+      `;
+
+      // Remove the error from the URL without reloading
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  </script>
+
+</body>
+</html>

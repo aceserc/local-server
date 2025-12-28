@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin - Taranga AR Bug Hunt</title>
+
+    <!-- Google Fonts: Syne for headers, Poppins for UI -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&family=Syne:wght@700;800&display=swap"
+        rel="stylesheet" />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                        display: ['Syne', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #000000;
+            color: #d4d4d8;
+        }
+
+        /* Custom Scrollbar for large datasets */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #09090b;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #27272a;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3f3f46;
+        }
+
+        .glass-card {
+            background: rgba(9, 9, 11, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .sticky-header th {
+            position: sticky;
+            top: 0;
+            background: #18181b;
+            z-index: 10;
+        }
+
+        /* Prevent table layout jumping */
+        table {
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+    </style>
+</head>
+
+<body class="antialiased min-h-screen pb-12">
+    <!-- Top Navigation / Header -->
+    <nav class="border-b border-white/10 py-6 mb-8 sticky top-0 bg-black/80 backdrop-blur-md z-50">
+        <div class="container mx-auto px-6 max-w-7xl flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-4">
+                <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
+                    <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-3.04l.533-.811a7.122 7.122 0 001.203-4.946 7.12 7.12 0 011.203-4.946l.533-.811m-.001 0a7.122 7.122 0 00-1.203 4.946 7.12 7.12 0 01-1.203 4.946l-.533.811m3.44 3.041A8.959 8.959 0 0112 21c-4.418 0-8-3.582-8-8 0-3.517 1.009-6.799 2.753-9.571m3.44 3.04l-.533.811a7.122 7.122 0 00-1.203 4.946 7.12 7.12 0 011.203-4.946l.533-.811m0 0a7.12 7.12 0 011.203-4.946 7.122 7.122 0 011.203 4.946l.533.811m0 0A8.959 8.959 0 0112 3c4.418 0 8 3.582 8 8 0 3.517-1.009 6.799-2.753 9.571m-3.44-3.04l.533-.811a7.122 7.122 0 001.203-4.946 7.12 7.12 0 011.203-4.946l.533-.811">
+                        </path>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="font-display text-xl text-white uppercase tracking-tight">Taranga Admin</h1>
+                    <p class="text-[10px] text-zinc-500 uppercase tracking-widest font-semibold">Generated:
+                        {{.GeneratedAt}}</p>
+                </div>
+            </div>
+            <div class="flex gap-2">
+                <span
+                    class="px-3 py-1 bg-zinc-900 border border-zinc-800 rounded-full text-[10px] text-zinc-400 font-bold uppercase tracking-wider">Live
+                    Updates</span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-6 max-w-7xl">
+
+        <!-- Summary Stats Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
+            <div class="glass-card rounded-2xl p-8 transition-transform hover:scale-[1.02] duration-300">
+                <p class="text-zinc-500 text-[10px] font-bold uppercase tracking-[0.2em] mb-1">Total Teams</p>
+                <h3 class="text-5xl font-display text-white">{{.TotalTeams}}</h3>
+            </div>
+            <div
+                class="glass-card rounded-2xl p-8 border-l-4 border-l-white transition-transform hover:scale-[1.02] duration-300">
+                <p class="text-zinc-500 text-[10px] font-bold uppercase tracking-[0.2em] mb-1 text-white/60">Downloaded
+                    APK</p>
+                <h3 class="text-5xl font-display text-white">{{.DownloadedTeams}}</h3>
+            </div>
+            <div class="glass-card rounded-2xl p-8 transition-transform hover:scale-[1.02] duration-300">
+                <p class="text-zinc-500 text-[10px] font-bold uppercase tracking-[0.2em] mb-1">Pending Sync</p>
+                <h3 class="text-5xl font-display text-zinc-600">{{.PendingTeams}}</h3>
+            </div>
+        </div>
+
+        <!-- Team Status Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
+            <!-- Downloaded List -->
+            <div class="glass-card rounded-3xl overflow-hidden flex flex-col h-[500px]">
+                <div class="p-6 border-b border-white/10 flex justify-between items-center bg-zinc-950">
+                    <h2 class="font-display text-lg text-white uppercase tracking-tight">✅ Completed</h2>
+                    <span class="text-xs font-mono bg-white text-black px-2 py-0.5 rounded">{{.DownloadedTeams}}</span>
+                </div>
+                <div class="p-4 overflow-y-auto flex-grow space-y-2">
+                    {{range .DownloadedTeamsList}}
+                    <div
+                        class="group flex items-center justify-between bg-zinc-900/50 hover:bg-zinc-800 p-4 rounded-xl border border-white/5 transition-colors">
+                        <span class="font-medium text-zinc-200">{{.Name}}</span>
+                        <span class="text-xs font-mono text-zinc-500">#{{.Number}}</span>
+                    </div>
+                    {{else}}
+                    <div class="h-full flex flex-col items-center justify-center opacity-30">
+                        <p class="text-sm">Queue is empty</p>
+                    </div>
+                    {{end}}
+                </div>
+            </div>
+
+            <!-- Pending List -->
+            <div class="glass-card rounded-3xl overflow-hidden flex flex-col h-[500px]">
+                <div class="p-6 border-b border-white/10 flex justify-between items-center bg-zinc-950">
+                    <h2 class="font-display text-lg text-zinc-500 uppercase tracking-tight">⏳ Pending</h2>
+                    <span
+                        class="text-xs font-mono bg-zinc-800 text-zinc-400 px-2 py-0.5 rounded">{{.PendingTeams}}</span>
+                </div>
+                <div class="p-4 overflow-y-auto flex-grow space-y-2">
+                    {{range .PendingTeamsList}}
+                    <div class="flex items-center justify-between bg-black p-4 rounded-xl border border-white/5">
+                        <span class="font-medium text-zinc-400">{{.Name}}</span>
+                        <span class="text-xs font-mono text-zinc-600">#{{.Number}}</span>
+                    </div>
+                    {{else}}
+                    <div class="h-full flex flex-col items-center justify-center py-20 text-center">
+                        <p class="text-2xl mb-2">🎉</p>
+                        <p class="text-xs uppercase tracking-widest text-zinc-500">All teams synced</p>
+                    </div>
+                    {{end}}
+                </div>
+            </div>
+        </div>
+
+        <!-- Download Logs (Large Data Table) -->
+        <div class="glass-card rounded-3xl overflow-hidden">
+            <div class="p-6 border-b border-white/10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <h2 class="font-display text-xl text-white uppercase tracking-tight">📜 System Logs</h2>
+                <div
+                    class="text-[10px] text-zinc-500 font-bold uppercase tracking-widest bg-zinc-900 px-3 py-1.5 rounded-lg border border-white/5">
+                    Real-time Activity Stream
+                </div>
+            </div>
+
+            <div class="overflow-x-auto max-h-[600px] overflow-y-auto relative">
+                <table class="w-full text-left text-sm">
+                    <thead class="sticky-header">
+                        <tr>
+                            <th
+                                class="px-6 py-4 font-bold text-zinc-400 uppercase tracking-widest text-[10px] border-b border-white/10">
+                                Team Entity</th>
+                            <th
+                                class="px-6 py-4 font-bold text-zinc-400 uppercase tracking-widest text-[10px] border-b border-white/10">
+                                UID</th>
+                            <th
+                                class="px-6 py-4 font-bold text-zinc-400 uppercase tracking-widest text-[10px] border-b border-white/10">
+                                Timestamp</th>
+                            <th
+                                class="px-6 py-4 font-bold text-zinc-400 uppercase tracking-widest text-[10px] border-b border-white/10 text-right">
+                                Access IP</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/5">
+                        {{range .DownloadLogs}}
+                        <tr class="hover:bg-zinc-900 transition-colors group">
+                            <td class="px-6 py-4 font-semibold text-white group-hover:pl-8 transition-all duration-300">
+                                {{.TeamName}}</td>
+                            <td class="px-6 py-4 font-mono text-zinc-500">#{{.TeamNumber}}</td>
+                            <td class="px-6 py-4 text-zinc-400">{{.Timestamp}}</td>
+                            <td class="px-6 py-4 text-right">
+                                <span
+                                    class="font-mono text-[10px] px-2 py-1 bg-zinc-900 rounded border border-white/5 text-zinc-500">
+                                    {{.IP}}
+                                </span>
+                            </td>
+                        </tr>
+                        {{else}}
+                        <tr>
+                            <td colspan="4" class="text-center py-20 text-zinc-600 uppercase tracking-widest text-xs">
+                                No activity recorded
+                            </td>
+                        </tr>
+                        {{end}}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="mt-16 text-center border-t border-white/10 pt-8 opacity-40">
+            <p class="text-[10px] uppercase tracking-[0.4em] font-bold">Taranga Security Protocol v2.4.0</p>
+        </div>
+    </div>
+</body>
+
+</html>
