@@ -6,45 +6,65 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Admin - Taranga AR Bug Hunt</title>
 
-    <!-- Google Fonts: Syne for headers, Poppins for UI -->
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
         href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&family=Syne:wght@700;800&display=swap"
         rel="stylesheet" />
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Poppins', 'sans-serif'],
-                        display: ['Syne', 'sans-serif']
-                    }
-                }
-            }
-        }
-    </script>
-
     <style>
-        body {
-            background-color: #000000;
-            color: #d4d4d8;
+        /* --- CSS Variables & Theme --- */
+        :root {
+            --bg-black: #000000;
+            --bg-zinc-dark: #09090b;
+            --bg-zinc-card: #18181b;
+            --zinc-400: #a1a1aa;
+            --zinc-500: #71717a;
+            --zinc-600: #52525b;
+            --zinc-800: #27272a;
+            --text-white: #ffffff;
+            --text-zinc: #d4d4d8;
+            --border-white: rgba(255, 255, 255, 0.1);
+            --font-main: 'Poppins', sans-serif;
+            --font-display: 'Syne', sans-serif;
         }
 
-        /* Custom Scrollbar for large datasets */
+        /* --- Reset & Global --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-black);
+            color: var(--text-zinc);
+            font-family: var(--font-main);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            padding-bottom: 3rem;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        /* --- Scrollbar Customization --- */
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
         }
 
         ::-webkit-scrollbar-track {
-            background: #09090b;
+            background: var(--bg-zinc-dark);
         }
 
         ::-webkit-scrollbar-thumb {
-            background: #27272a;
+            background: var(--zinc-800);
             border-radius: 10px;
         }
 
@@ -52,165 +72,488 @@
             background: #3f3f46;
         }
 
-        .glass-card {
-            background: rgba(9, 9, 11, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        /* --- Navigation --- */
+        nav {
+            border-bottom: 1px solid var(--border-white);
+            padding: 1.5rem 0;
+            margin-bottom: 2rem;
+            position: sticky;
+            top: 0;
+            background: rgba(0, 0, 0, 0.8);
             backdrop-filter: blur(10px);
+            z-index: 50;
         }
 
-        .sticky-header th {
+        .nav-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .nav-content {
+                flex-direction: row;
+            }
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-box {
+            width: 2.5rem;
+            height: 2.5rem;
+            background: var(--text-white);
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-box svg {
+            width: 1.5rem;
+            height: 1.5rem;
+            color: var(--bg-black);
+        }
+
+        .nav-title h1 {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            color: var(--text-white);
+            text-transform: uppercase;
+            letter-spacing: -0.025em;
+        }
+
+        .nav-title p {
+            font-size: 10px;
+            color: var(--zinc-500);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-weight: 600;
+        }
+
+        .badge-live {
+            padding: 0.25rem 0.75rem;
+            background: #18181b;
+            border: 1px solid var(--zinc-800);
+            border-radius: 9999px;
+            font-size: 10px;
+            color: var(--zinc-400);
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* --- Cards & Grid --- */
+        .glass-card {
+            background: rgba(9, 9, 11, 0.8);
+            border: 1px solid var(--border-white);
+            backdrop-filter: blur(10px);
+            border-radius: 1.5rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        @media (min-width: 640px) {
+            .stats-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .stat-card {
+            padding: 2rem;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .stat-card.accent {
+            border-left: 4px solid var(--text-white);
+        }
+
+        .stat-label {
+            color: var(--zinc-500);
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-value {
+            font-family: var(--font-display);
+            font-size: 3rem;
+            color: var(--text-white);
+            line-height: 1;
+        }
+
+        .stat-value.muted {
+            color: var(--zinc-600);
+        }
+
+        /* --- Status Lists --- */
+        .status-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            margin-bottom: 2.5rem;
+        }
+
+        @media (min-width: 1024px) {
+            .status-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .status-panel {
+            display: flex;
+            flex-direction: column;
+            height: 500px;
+            overflow: hidden;
+            border-radius: 1.875rem;
+        }
+
+        .panel-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-white);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #09090b;
+        }
+
+        .panel-header h2 {
+            font-family: var(--font-display);
+            font-size: 1.125rem;
+            text-transform: uppercase;
+            color: var(--text-white);
+        }
+
+        .panel-header.pending h2 {
+            color: var(--zinc-500);
+        }
+
+        .pill {
+            font-size: 0.75rem;
+            font-family: monospace;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .pill-white {
+            background: var(--text-white);
+            color: var(--bg-black);
+        }
+
+        .pill-zinc {
+            background: var(--zinc-800);
+            color: var(--zinc-400);
+        }
+
+        .panel-body {
+            padding: 1rem;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+
+        .team-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            margin-bottom: 0.5rem;
+            transition: background 0.2s ease;
+        }
+
+        .team-row.completed {
+            background: rgba(24, 24, 27, 0.5);
+        }
+
+        .team-row.completed:hover {
+            background: #18181b;
+        }
+
+        .team-row.pending {
+            background: #000;
+        }
+
+        .team-name {
+            font-weight: 500;
+            color: var(--text-zinc);
+        }
+
+        .team-row.pending .team-name {
+            color: var(--zinc-400);
+        }
+
+        .team-id {
+            font-size: 0.75rem;
+            font-family: monospace;
+            color: var(--zinc-500);
+        }
+
+        .empty-state {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.3;
+        }
+
+        /* --- Log Table --- */
+        .logs-panel {
+            border-radius: 1.875rem;
+            overflow: hidden;
+        }
+
+        .logs-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-white);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .logs-header {
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+            }
+        }
+
+        .logs-title {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            text-transform: uppercase;
+            color: var(--text-white);
+        }
+
+        .logs-tag {
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            background: #18181b;
+            padding: 0.375rem 0.75rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-white);
+            color: var(--zinc-500);
+        }
+
+        .table-container {
+            max-height: 600px;
+            overflow: auto;
+            position: relative;
+        }
+
+        table {
+            width: 100%;
+            text-align: left;
+            font-size: 0.875rem;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        th {
             position: sticky;
             top: 0;
             background: #18181b;
             z-index: 10;
+            padding: 1rem 1.5rem;
+            font-weight: bold;
+            color: var(--zinc-400);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-size: 10px;
+            border-bottom: 1px solid var(--border-white);
         }
 
-        /* Prevent table layout jumping */
-        table {
-            border-collapse: separate;
-            border-spacing: 0;
+        td {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        tr:hover {
+            background: #18181b;
+        }
+
+        .log-team {
+            font-weight: 600;
+            color: var(--text-white);
+            transition: padding 0.3s ease;
+        }
+
+        tr:hover .log-team {
+            padding-left: 2rem;
+        }
+
+        .log-uid {
+            font-family: monospace;
+            color: var(--zinc-500);
+        }
+
+        .log-time {
+            color: var(--zinc-400);
+        }
+
+        .ip-badge {
+            font-family: monospace;
+            font-size: 10px;
+            padding: 0.25rem 0.5rem;
+            background: #18181b;
+            border-radius: 4px;
+            border: 1px solid var(--border-white);
+            color: var(--zinc-500);
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        /* --- Footer --- */
+        footer {
+            margin-top: 4rem;
+            text-align: center;
+            border-top: 1px solid var(--border-white);
+            padding-top: 2rem;
+            opacity: 0.4;
+        }
+
+        .footer-text {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.4em;
+            font-weight: bold;
         }
     </style>
 </head>
 
-<body class="antialiased min-h-screen pb-12">
-    <!-- Top Navigation / Header -->
-    <nav class="border-b border-white/10 py-6 mb-8 sticky top-0 bg-black/80 backdrop-blur-md z-50">
-        <div class="container mx-auto px-6 max-w-7xl flex flex-col md:flex-row justify-between items-center gap-4">
-            <div class="flex items-center gap-4">
-                <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
-                    <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<body>
+    <!-- Top Navigation -->
+    <nav>
+        <div class="container nav-content">
+            <div class="nav-brand">
+                <div class="logo-box">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-3.04l.533-.811a7.122 7.122 0 001.203-4.946 7.12 7.12 0 011.203-4.946l.533-.811m-.001 0a7.122 7.122 0 00-1.203 4.946 7.12 7.12 0 01-1.203 4.946l-.533.811m3.44 3.041A8.959 8.959 0 0112 21c-4.418 0-8-3.582-8-8 0-3.517 1.009-6.799 2.753-9.571m3.44 3.04l-.533.811a7.122 7.122 0 00-1.203 4.946 7.12 7.12 0 011.203-4.946l.533-.811m0 0a7.12 7.12 0 011.203-4.946 7.122 7.122 0 011.203 4.946l.533.811m0 0A8.959 8.959 0 0112 3c4.418 0 8 3.582 8 8 0 3.517-1.009 6.799-2.753 9.571m-3.44-3.04l.533-.811a7.122 7.122 0 001.203-4.946 7.12 7.12 0 011.203-4.946l.533-.811">
                         </path>
                     </svg>
                 </div>
-                <div>
-                    <h1 class="font-display text-xl text-white uppercase tracking-tight">Taranga Admin</h1>
-                    <p class="text-[10px] text-zinc-500 uppercase tracking-widest font-semibold">Generated:
-                        {{.GeneratedAt}}</p>
+                <div class="nav-title">
+                    <h1>Taranga Admin</h1>
+                    <p>Generated: {{.GeneratedAt}}</p>
                 </div>
             </div>
-            <div class="flex gap-2">
-                <span
-                    class="px-3 py-1 bg-zinc-900 border border-zinc-800 rounded-full text-[10px] text-zinc-400 font-bold uppercase tracking-wider">Live
-                    Updates</span>
-            </div>
+            <div class="badge-live">Live Updates</div>
         </div>
     </nav>
 
-    <div class="container mx-auto px-6 max-w-7xl">
-
+    <div class="container">
         <!-- Summary Stats Grid -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
-            <div class="glass-card rounded-2xl p-8 transition-transform hover:scale-[1.02] duration-300">
-                <p class="text-zinc-500 text-[10px] font-bold uppercase tracking-[0.2em] mb-1">Total Teams</p>
-                <h3 class="text-5xl font-display text-white">{{.TotalTeams}}</h3>
+        <div class="stats-grid">
+            <div class="glass-card stat-card">
+                <p class="stat-label">Total Teams</p>
+                <h3 class="stat-value">{{.TotalTeams}}</h3>
             </div>
-            <div
-                class="glass-card rounded-2xl p-8 border-l-4 border-l-white transition-transform hover:scale-[1.02] duration-300">
-                <p class="text-zinc-500 text-[10px] font-bold uppercase tracking-[0.2em] mb-1 text-white/60">Downloaded
-                    APK</p>
-                <h3 class="text-5xl font-display text-white">{{.DownloadedTeams}}</h3>
+            <div class="glass-card stat-card accent">
+                <p class="stat-label" style="color: rgba(255,255,255,0.6)">Downloaded APK</p>
+                <h3 class="stat-value">{{.DownloadedTeams}}</h3>
             </div>
-            <div class="glass-card rounded-2xl p-8 transition-transform hover:scale-[1.02] duration-300">
-                <p class="text-zinc-500 text-[10px] font-bold uppercase tracking-[0.2em] mb-1">Pending Sync</p>
-                <h3 class="text-5xl font-display text-zinc-600">{{.PendingTeams}}</h3>
+            <div class="glass-card stat-card">
+                <p class="stat-label">Pending Sync</p>
+                <h3 class="stat-value muted">{{.PendingTeams}}</h3>
             </div>
         </div>
 
         <!-- Team Status Section -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
+        <div class="status-grid">
             <!-- Downloaded List -->
-            <div class="glass-card rounded-3xl overflow-hidden flex flex-col h-[500px]">
-                <div class="p-6 border-b border-white/10 flex justify-between items-center bg-zinc-950">
-                    <h2 class="font-display text-lg text-white uppercase tracking-tight">✅ Completed</h2>
-                    <span class="text-xs font-mono bg-white text-black px-2 py-0.5 rounded">{{.DownloadedTeams}}</span>
+            <div class="glass-card status-panel">
+                <div class="panel-header">
+                    <h2>✅ Completed</h2>
+                    <span class="pill pill-white">{{.DownloadedTeams}}</span>
                 </div>
-                <div class="p-4 overflow-y-auto flex-grow space-y-2">
+                <div class="panel-body">
                     {{range .DownloadedTeamsList}}
-                    <div
-                        class="group flex items-center justify-between bg-zinc-900/50 hover:bg-zinc-800 p-4 rounded-xl border border-white/5 transition-colors">
-                        <span class="font-medium text-zinc-200">{{.Name}}</span>
-                        <span class="text-xs font-mono text-zinc-500">#{{.Number}}</span>
+                    <div class="team-row completed">
+                        <span class="team-name">{{.Name}}</span>
+                        <span class="team-id">#{{.Number}}</span>
                     </div>
                     {{else}}
-                    <div class="h-full flex flex-col items-center justify-center opacity-30">
-                        <p class="text-sm">Queue is empty</p>
+                    <div class="empty-state">
+                        <p>Queue is empty</p>
                     </div>
                     {{end}}
                 </div>
             </div>
 
             <!-- Pending List -->
-            <div class="glass-card rounded-3xl overflow-hidden flex flex-col h-[500px]">
-                <div class="p-6 border-b border-white/10 flex justify-between items-center bg-zinc-950">
-                    <h2 class="font-display text-lg text-zinc-500 uppercase tracking-tight">⏳ Pending</h2>
-                    <span
-                        class="text-xs font-mono bg-zinc-800 text-zinc-400 px-2 py-0.5 rounded">{{.PendingTeams}}</span>
+            <div class="glass-card status-panel">
+                <div class="panel-header pending">
+                    <h2>⏳ Pending</h2>
+                    <span class="pill pill-zinc">{{.PendingTeams}}</span>
                 </div>
-                <div class="p-4 overflow-y-auto flex-grow space-y-2">
+                <div class="panel-body">
                     {{range .PendingTeamsList}}
-                    <div class="flex items-center justify-between bg-black p-4 rounded-xl border border-white/5">
-                        <span class="font-medium text-zinc-400">{{.Name}}</span>
-                        <span class="text-xs font-mono text-zinc-600">#{{.Number}}</span>
+                    <div class="team-row pending">
+                        <span class="team-name">{{.Name}}</span>
+                        <span class="team-id">#{{.Number}}</span>
                     </div>
                     {{else}}
-                    <div class="h-full flex flex-col items-center justify-center py-20 text-center">
-                        <p class="text-2xl mb-2">🎉</p>
-                        <p class="text-xs uppercase tracking-widest text-zinc-500">All teams synced</p>
+                    <div class="empty-state" style="opacity: 1">
+                        <p style="font-size: 2rem; margin-bottom: 0.5rem;">🎉</p>
+                        <p class="stat-label">All teams synced</p>
                     </div>
                     {{end}}
                 </div>
             </div>
         </div>
 
-        <!-- Download Logs (Large Data Table) -->
-        <div class="glass-card rounded-3xl overflow-hidden">
-            <div class="p-6 border-b border-white/10 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <h2 class="font-display text-xl text-white uppercase tracking-tight">📜 System Logs</h2>
-                <div
-                    class="text-[10px] text-zinc-500 font-bold uppercase tracking-widest bg-zinc-900 px-3 py-1.5 rounded-lg border border-white/5">
-                    Real-time Activity Stream
-                </div>
+        <!-- Download Logs -->
+        <div class="glass-card logs-panel">
+            <div class="logs-header">
+                <h2 class="logs-title">📜 System Logs</h2>
+                <div class="logs-tag">Real-time Activity Stream</div>
             </div>
 
-            <div class="overflow-x-auto max-h-[600px] overflow-y-auto relative">
-                <table class="w-full text-left text-sm">
-                    <thead class="sticky-header">
+            <div class="table-container">
+                <table>
+                    <thead>
                         <tr>
-                            <th
-                                class="px-6 py-4 font-bold text-zinc-400 uppercase tracking-widest text-[10px] border-b border-white/10">
-                                Team Entity</th>
-                            <th
-                                class="px-6 py-4 font-bold text-zinc-400 uppercase tracking-widest text-[10px] border-b border-white/10">
-                                UID</th>
-                            <th
-                                class="px-6 py-4 font-bold text-zinc-400 uppercase tracking-widest text-[10px] border-b border-white/10">
-                                Timestamp</th>
-                            <th
-                                class="px-6 py-4 font-bold text-zinc-400 uppercase tracking-widest text-[10px] border-b border-white/10 text-right">
-                                Access IP</th>
+                            <th>Team Entity</th>
+                            <th>UID</th>
+                            <th>Timestamp</th>
+                            <th class="text-right">Access IP</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-white/5">
+                    <tbody>
                         {{range .DownloadLogs}}
-                        <tr class="hover:bg-zinc-900 transition-colors group">
-                            <td class="px-6 py-4 font-semibold text-white group-hover:pl-8 transition-all duration-300">
-                                {{.TeamName}}</td>
-                            <td class="px-6 py-4 font-mono text-zinc-500">#{{.TeamNumber}}</td>
-                            <td class="px-6 py-4 text-zinc-400">{{.Timestamp}}</td>
-                            <td class="px-6 py-4 text-right">
-                                <span
-                                    class="font-mono text-[10px] px-2 py-1 bg-zinc-900 rounded border border-white/5 text-zinc-500">
-                                    {{.IP}}
-                                </span>
-                            </td>
+                        <tr>
+                            <td class="log-team">{{.TeamName}}</td>
+                            <td class="log-uid">#{{.TeamNumber}}</td>
+                            <td class="log-time">{{.Timestamp}}</td>
+                            <td class="text-right"><span class="ip-badge">{{.IP}}</span></td>
                         </tr>
                         {{else}}
                         <tr>
-                            <td colspan="4" class="text-center py-20 text-zinc-600 uppercase tracking-widest text-xs">
-                                No activity recorded
+                            <td colspan="4" class="empty-state" style="padding: 5rem 0;">
+                                <p class="stat-label">No activity recorded</p>
                             </td>
                         </tr>
                         {{end}}
@@ -220,9 +563,9 @@
         </div>
 
         <!-- Footer -->
-        <div class="mt-16 text-center border-t border-white/10 pt-8 opacity-40">
-            <p class="text-[10px] uppercase tracking-[0.4em] font-bold">Taranga Security Protocol v2.4.0</p>
-        </div>
+        <footer>
+            <p class="footer-text">Taranga Security Protocol v2.4.0</p>
+        </footer>
     </div>
 </body>
 

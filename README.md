@@ -1,73 +1,73 @@
 # Taranga AR Bug Hunt - APK Download Server
 
-A lightweight, secure Go-based server designed for distributing APKs (or other files) during events. It features team verification, one-time download enforcement, and a real-time admin dashboard.
+A lightweight, high-performance Go-based server designed for distributing APKs or assets during events. It features team verification, one-time download enforcement, and a sleek real-time admin dashboard.
 
 ## 🚀 Features
 
--   **Team Verification:** Only teams registered in the system (via `teams.csv`) can access the download.
--   **One-Time Download:** Prevents multiple downloads by the same team to ensure fair play or resource control.
--   **Admin Dashboard:** Real-time statistics including:
-    -   Total registered teams.
-    -   Successfully downloaded teams.
-    -   Pending teams.
-    -   Detailed download logs with IP addresses and timestamps.
--   **SQLite Backend:** Simple and portable database for storing team data and download logs.
--   **Embedded UI:** HTML templates are embedded into the Go binary for easy deployment.
--   **Detailed Logging:** All activities are logged to both the console and a file (`download_server.log`).
+-   **Team Verification:** Access is restricted to teams pre-registered in the system via `teams.csv`.
+-   **One-Time Download:** Prevents multiple downloads by the same team to ensure resource control and prevent unauthorized sharing.
+-   **Dynamic File Distribution:** Supports serving both individual files (e.g., `.apk`) and entire directories.
+-   **Real-time Admin Dashboard:** A premium, dark-themed dashboard providing:
+    -   Live statistics (Total, Downloaded, and Pending teams).
+    -   Detailed activity logs with timestamps and client IP addresses.
+    -   Categorized views for completed and pending team syncs.
+-   **Automatic Database Management:** Environment-ready with automatic SQLite database creation (`teams.db` and `downloads_log.db`).
+-   **QR Code Utility:** Built-in tool to generate and display a QR code in the terminal for the server's network URL, facilitating quick access for mobile users.
+-   **Network Awareness:** Automatically detects the host's local network IP to simplify mobile connectivity.
+-   **Embedded UI:** All frontend assets are embedded into the Go binary for simple, single-file deployment.
 
-## 🛠️ Prerequisites
+## 🛠️ Tech Stack
 
--   **Go:** Version 1.23 or higher.
--   **GCC:** (Required by `go-sqlite3` for CGO)
+-   **Backend:** Go (Optimized for 1.25+)
+-   **Database:** SQLite3
+-   **Frontend:** HTML5, CSS3 (Vanilla), Embedded via `go:embed`
+-   **Design:** Premium Dark Mode (Google Fonts: Syne & Poppins)
 
 ## 📦 Getting Started
 
-1.  **Clone the repository:**
-    ```bash
-    git clone https://github.com/dev-sandip/local-server.git
-    cd local-server
-    ```
+### 1. Configure Teams
+Create or edit `teams.csv` in the root directory. The server uses this to seed the internal database.
+```csv
+Team Name, Team Number
+Shadow Hunters, 101
+Byte Masters, 102
+```
 
-2.  **Prepare your team list:**
-    Edit `teams.csv` to include your participating teams. The format should be:
-    ```csv
-    Team Name, Team Number
-    Team Alpha, 101
-    Team Beta, 102
-    ```
+### 2. Set Up the Server
+Open `main.go` and adjust the constants to match your environment:
+-   `adminPassphrase`: Security key for dashboard access.
+-   `downloadPath`: Path to the file or folder you wish to distribute.
+-   `port`: Default is `:8080`.
 
-3.  **Configure the server (Optional):**
-    Open `main.go` and modify the constants at the top:
-    -   `adminPassphrase`: The password for accessing the admin panel.
-    -   `port`: The port the server will run on (default `:8080`).
-    -   `downloadPath`: Path to the APK or folder you want to distribute.
+### 3. Run the Server
+```bash
+go mod tidy
+go run main.go
+```
 
-4.  **Install dependencies:**
-    ```bash
-    go mod tidy
-    ```
-
-5.  **Run the server:**
-    ```bash
-    go run main.go
-    ```
+### 4. Display the QR Code (Optional)
+To help participants quickly access the download page, run the QR utility in a separate terminal:
+```bash
+go run utils/qr.go
+```
 
 ## 🔐 Admin Dashboard
 
-Access the admin dashboard at:
+The dashboard is accessible via:
 `http://localhost:8080/admin?pass=your_passphrase`
 
-Replace `your_passphrase` with the value set in `main.go` (default is `sandip`).
+Replace `your_passphrase` with the value set in `main.go`.
 
 ## 📁 Project Structure
 
--   `main.go`: The core server logic and API handlers.
--   `index.html`: The public-facing team verification and download page.
--   `admin.html`: The administrative dashboard.
--   `teams.csv`: Source file for seeding the registered teams list.
--   `teams.db`: SQLite database storing registered team information.
--   `downloads_log.db`: SQLite database tracking download history.
--   `download_server.log`: Text file for persistent server logs.
+-   `main.go`: Main server application logic and API.
+-   `utils/qr.go`: Utility to generate and display server URL as a QR code.
+-   `index.html`: Public-facing verification and download page.
+-   `admin.html`: Real-time administrative dashboard.
+-   `teams.csv`: Source file for registered teams.
+-   `teams.db`: Persistent storage for team data.
+-   `downloads_log.db`: Persistent storage for download history and logs.
+-   `download_server.log`: System log file for auditing.
 
 ## 🛡️ License
 
